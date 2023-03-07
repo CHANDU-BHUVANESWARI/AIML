@@ -1,0 +1,65 @@
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt 
+import numpy as np 
+import os 
+import pandas as pd 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import classification_report 
+from sklearn.metrics import confusion_matrix ,accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB,MultinomialNB,BernoulliNB,ComplementNB,CategoricalNB
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+def plotCorrelationMatrix(df, graphWidth):
+    filename = df.dataframeName
+    df = df.dropna('columns') # drop columns with NaN
+    df = df[[col for col in df if df[col].nunique() > 1]] # keep columns where there are more than 1 unique values
+    if df.shape[1] < 2:
+        print(f'No correlation plots shown: The number of non-NaN or constant columns ({df.shape[1]}) is less than 2')
+        return
+    corr = df.corr()
+    plt.figure(num=None, figsize=(graphWidth, graphWidth), dpi=80, facecolor='w', edgecolor='k')
+    corrMat = plt.matshow(corr, fignum = 1)
+    plt.xticks(range(len(corr.columns)), corr.columns, rotation=90)
+    plt.yticks(range(len(corr.columns)), corr.columns)
+    plt.gca().xaxis.tick_bottom()
+    plt.colorbar(corrMat)
+    plt.title(f'Correlation Matrix for {filename}', fontsize=15)
+    plt.show()
+    def plotScatterMatrix(df, plotSize, textSize):
+    df = df.select_dtypes(include =[np.number]) 
+    
+    df = df.dropna('columns')
+    df = df[[col for col in df if df[col].nunique() > 1]] 
+    columnNames = list(df)
+    if len(columnNames) > 10: 
+        columnNames = columnNames[:10]
+    df = df[columnNames]
+    ax = pd.plotting.scatter_matrix(df, alpha=0.75, figsize=[plotSize, plotSize], diagonal='kde')
+    corrs = df.corr().values
+    for i, j in zip(*plt.np.triu_indices_from(ax, k = 1)):
+        ax[i, j].annotate('Corr. coef = %.3f' % corrs[i, j], (0.8, 0.2), xycoords='axes fraction', ha='center', va='center', size=textSize)
+    plt.suptitle('Scatter and Density Plot')
+    plt.show()
+    nRowsRead = 1000 
+
+df1 = pd.read_csv("Mushroom Data - Mushroom.csv",delimiter=',', nrows = nRowsRead)
+df1.dataframeName = 'Mushroom Data-Mushroom.csv'
+nRow, nCol = df1.shape
+print(f'There are {nRow} rows and {nCol} columns')
+df1.head(5)
+x = df1.drop('class', axis=1) 
+y = df1['class']
+  for col in df1.columns:
+    lb = LabelEncoder()
+    df1[col] = lb.fit_transform(df1[col].values)
+df1
+x_train, x_test, y_train, y_test = train_test_split(x,y)
